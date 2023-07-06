@@ -1,38 +1,54 @@
 package com.egorbekherev.springsecurity.configuration;
 
+import com.egorbekherev.springsecurity.service.JdbcUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 @Configuration
 public class SpringSecurityConfiguration {
 
-//    basic authentication
+    @Bean
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailsService(dataSource);
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
-        basicAuthenticationEntryPoint.setRealmName("Realm");
         return http
-                .httpBasic().authenticationEntryPoint((request, response, authException) -> {
-                    authException.printStackTrace();
-                    basicAuthenticationEntryPoint.commence(request, response, authException);
-                }).and()
+                .httpBasic().and()
                 .authorizeHttpRequests()
                     .anyRequest().authenticated().and()
-                .exceptionHandling()
-                .authenticationEntryPoint(basicAuthenticationEntryPoint).and()
                 .build();
     }
+
+//    basic authentication
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
+//        basicAuthenticationEntryPoint.setRealmName("Realm");
+//        return http
+//                .httpBasic().authenticationEntryPoint((request, response, authException) -> {
+//                    authException.printStackTrace();
+//                    basicAuthenticationEntryPoint.commence(request, response, authException);
+//                }).and()
+//                .authorizeHttpRequests()
+//                    .anyRequest().authenticated().and()
+//                .exceptionHandling()
+//                .authenticationEntryPoint(basicAuthenticationEntryPoint).and()
+//                .build();
+//    }
 
     @Bean
     public RouterFunction<ServerResponse> routerFunction() {
