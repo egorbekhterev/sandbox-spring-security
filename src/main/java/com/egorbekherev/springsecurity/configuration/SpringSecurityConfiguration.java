@@ -4,6 +4,7 @@ import com.egorbekherev.springsecurity.service.JdbcUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,9 +28,8 @@ public class SpringSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .httpBasic().and()
-                .authorizeHttpRequests()
-                    .anyRequest().authenticated().and()
+                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated())
                 .build();
     }
 
@@ -39,14 +39,12 @@ public class SpringSecurityConfiguration {
 //        BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
 //        basicAuthenticationEntryPoint.setRealmName("Realm");
 //        return http
-//                .httpBasic().authenticationEntryPoint((request, response, authException) -> {
+//                .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint((request, response, authException) -> {
 //                    authException.printStackTrace();
 //                    basicAuthenticationEntryPoint.commence(request, response, authException);
-//                }).and()
-//                .authorizeHttpRequests()
-//                    .anyRequest().authenticated().and()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(basicAuthenticationEntryPoint).and()
+//                }))
+//                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().authenticated())
+//                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(basicAuthenticationEntryPoint))
 //                .build();
 //    }
 
@@ -69,13 +67,13 @@ public class SpringSecurityConfiguration {
 //    @Bean
 //    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        return http
-//                .authorizeHttpRequests()
-//                .requestMatchers("/public/**").permitAll()
-//                .anyRequest().authenticated().and()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(((request, response, authException) -> {
-//                    response.sendRedirect("http://localhost:8080/public/403.html");
-//                })).and()
+//                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+//                        .requestMatchers("/public/**").permitAll()
+//                        .anyRequest().authenticated())
+//                .exceptionHandling(exceptionHandling -> exceptionHandling
+//                        .authenticationEntryPoint((request, response, authException) -> {
+//                            response.sendRedirect("http://localhost:8080/public/403.html");
+//                        }))
 //                .build();
 //    }
 }
