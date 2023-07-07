@@ -7,6 +7,6 @@ spring:
       mode: always
   datasource:
     url: jdbc:tc:postgresql:15:///sandbox?TC_DAEMON=true
-#logging:
-#  level:
-#    org.springframework.security: trace
+logging:
+  level:
+    org.springframework.security: trace

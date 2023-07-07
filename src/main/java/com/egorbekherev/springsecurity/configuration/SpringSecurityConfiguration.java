@@ -1,13 +1,11 @@
 package com.egorbekherev.springsecurity.configuration;
 
-import com.egorbekherev.springsecurity.configurer.MyConfigurer;
+import com.egorbekherev.springsecurity.configurer.HexConfigurer;
 import com.egorbekherev.springsecurity.service.JdbcUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,28 +27,28 @@ public class SpringSecurityConfiguration {
         return new JdbcUserDetailsService(dataSource);
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("AM in securityFilterChain: {}", http.getSharedObject(AuthenticationManager.class));
-        http.apply(new MyConfigurer()).realmName("My custom realm name");
-        return http.build();
-    }
-
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        return http
-//                .httpBasic(Customizer.withDefaults())
-//                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-//                        .requestMatchers("/public/test", "/error").permitAll()
-//                        .anyRequest().authenticated())
-//
-////                for debugging
+//        log.info("AM in securityFilterChain: {}", http.getSharedObject(AuthenticationManager.class));
+//        http.apply(new MyConfigurer()).realmName("My custom realm name");
+//        return http.build();
+//    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+//                .addFilterBefore(new DeniedClientFilter(), DisableEncodeUrlFilter.class)
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated())
+                        .apply(new HexConfigurer());
+        return http.build();
+//                for debugging
 //                .exceptionHandling(exceptionHandling -> exceptionHandling
 //                        .accessDeniedHandler((request, response, accessDeniedException) -> {
 //                            accessDeniedException.printStackTrace();
 //                        }))
-//                .build();
-//    }
+    }
 
 //    basic authentication
 //    @Bean
